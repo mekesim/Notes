@@ -1,0 +1,60 @@
+# MAX6675开发板使用
+
+## MAX6675
+
+ Force CS low to output the first bit on the SO pin. A complete serial interface read requires 16 clock cycles. Read the 16 output bits on the falling edge of the clock. The first bit, D15, is a dummy sign bit and is always zero. Bits D14–D3 contain the converted temperature in the order of MSB to LSB. Bit D2 is normally low and goes high when the thermocouple input is open. D1 is low to provide a device ID for the MAX6675 and bit D0 is three-state.
+
+![](/assets/max6675data.png)
+
+![](/assets/6675SOoutput.png)
+
+## 代码
+
+代码修改自[此链接](https://github.com/JChristensen/Thermocouple)。
+
+打开下面的实例文件，上传到开发板。
+
+```
+#include <SPI.h>
+
+//Additionally, connect the MAX6675 as follows:
+//MISO  Arduino pin 12          //master in slave out
+//SCK   Arduino pin 13          //serial clock
+const int CS = 10;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(CS, OUTPUT);
+  digitalWrite(CS, HIGH);  
+  SPI.begin();                            //initialize SPI
+  delay(500);
+}
+
+void loop() {
+   unsigned int tcData;
+   float temp, avgTemp;
+   uint32_t d = 0;
+   digitalWrite(CS, LOW);
+   SPI.beginTransaction(SPISettings(4300000, MSBFIRST, SPI_MODE1));
+   tcData = SPI.transfer(0x00) << 8;
+   tcData |= SPI.transfer(0x00);  
+   digitalWrite(CS, HIGH);
+   if (tcData & 0x0004) {                  //open thermocouple circuit
+        Serial.println("Thermal Coupler Open."); 
+    }
+    else {
+   temp = (tcData >> 3) / 4.0;
+   Serial.print("C = "); 
+   Serial.println(temp); 
+    }
+   delay(1000);
+}
+```
+
+# MQTT
+
+服务器 Mosquitto  
+MQTT messaging for Raspberry Pi \(or Python\)，  Paho Python Client
+
+Arduino Client， PubSubClient
+

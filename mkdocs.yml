@@ -1,0 +1,11 @@
+# Project information
+site_name: 'Mekesim Notes'
+site_description: 'My notes about everything'
+site_author: '杨建林'
+site_url: 'https://github.com/mekesim/Notes'
+theme:
+  name: 'material'
+  palette:
+    primary: 'green'
+    accent: 'green'
+  language: 'zh'
