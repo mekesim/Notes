@@ -1,8 +1,87 @@
-# Installing ThingsBoard on Centos
+# ThingsBoard安装
 
-### Third-party components installation {#third-party-components-installation}
+分别介绍Windows和Centos下安装ThingsBoard
 
-#### Java {#java}
+
+
+## Windows Docker 方式安装
+
+### Installation steps
+
+- [安装Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/)
+
+- 打开 "Docker Quickstart Terminal"
+
+- 创建一个文件夹保存docker 文件:
+
+- 从thingsboard repo下载下面三个文件:
+
+  - **docker-compose.yml** - main docker-compose file.
+  - **.env** - main env file that contains default location of cassandra data folder and cassandra schema.
+  - **tb.env** - default thingsboard environment variables.
+
+  ```
+  curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-2.0/docker/docker-compose.yml > docker-compose.yml
+  curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-2.0/docker/.env > .env
+  curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-2.0/docker/tb.env > tb.env
+  ```
+
+- If you have already installed ThingsBoard using docker and want to upgrade or cleanup your installation, please cleanup HSQLDB data directory
+
+```
+docker-machine ssh default 'rm -rf /home/docker/hsqldb_volume'
+```
+
+- If you would like to create system and demo data and to start ThingsBoard node execute next command
+
+```
+ADD_SCHEMA_AND_SYSTEM_DATA=true ADD_DEMO_DATA=true bash -c 'docker-compose up -d tb'
+```
+
+- In case you would like to skip creation of system and demo data or you have already added and you only need to start ThingsBoard node then execute *docker-compose* command
+
+```
+docker-compose up -d tb
+```
+
+- In order to get access to necessary resources from external IP/Host after ThingsBoard docker container installation, please execute the following commands on windows host machine:
+
+```
+# Web UI port
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "tcp-port8080,tcp,,8080,,8080"
+# MQTT port
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "tcp-port1883,tcp,,1883,,1883"
+# CoAP port
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm "default" natpf1 "tcp-port5683,tcp,,5683,,5683"
+```
+
+- Now you should be able to open Web UI using following link:
+
+```
+http://localhost:8080/
+```
+
+### Advanced usage
+
+See corresponding page in [linux guide](https://github.com/thingsboard/thingsboard.github.io/blob/master/docs/user-guide/install/docker/#advanced-usage) for more details.
+
+### Troubleshooting
+
+#### DNS issues
+
+**Note** If you observe errors related to DNS issues, for example
+
+```
+127.0.1.1:53: cannot unmarshal DNS message
+```
+
+You may configure your system to use [Google public DNS servers](https://developers.google.com/speed/public-dns/docs/using#windows)
+
+## Installing ThingsBoard on Centos
+
+### Third-party components installation
+
+#### Java 
 
 install Oracle JDK 8
 
@@ -65,7 +144,7 @@ wget https://github.com/thingsboard/thingsboard/releases/download/v1.3/thingsboa
 sudo rpm -Uvh thingsboard-1.3.rpm
 ```
 
-### \[Optional\] Configure ThingsBoard to use the external database {#optional-configure-thingsboard-to-use-the-external-database}
+#### \[Optional\] Configure ThingsBoard to use the external database {#optional-configure-thingsboard-to-use-the-external-database}
 
 **NOTE:**This is an**optional**step. It is required only for production usage. You can use embedded HSQLDB for platform evaluation or development
 
